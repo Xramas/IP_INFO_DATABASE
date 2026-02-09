@@ -2,6 +2,7 @@ name: Update IP Databases
 
 on:
   schedule:
+    # 北京时间每天 08:00 (UTC 00:00) 运行
     - cron: '0 0 * * *'
   workflow_dispatch:
 
@@ -16,18 +17,18 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Prepare Output Directory
-        run: mkdir -p output
+        # 创建目录并给予 777 权限，确保 Docker 容器内的用户能写入文件
+        run: |
+          mkdir -p output
+          chmod 777 output
 
       # ----------------------------------------------------------------
-      # 1. IPinfo (Curl with User-Agent)
+      # 1. IPinfo (Curl)
       # ----------------------------------------------------------------
       - name: Download IPinfo
         run: |
           echo "Downloading IPinfo..."
-          curl -s -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
-            -o output/ipinfo_lite.mmdb \
-            "https://ipinfo.io/data/ipinfo_lite.mmdb?_src=frontend&token=${{ secrets.IPINFO_TOKEN }}"
-          echo "IPinfo downloaded."
+          curl -s -L -A "Mozilla/5.0" -o output/ipinfo_lite.mmdb "https://ipinfo.io/data/ipinfo_lite.mmdb?_src=frontend&token=${{ secrets.IPINFO_TOKEN }}"
 
       # ----------------------------------------------------------------
       # 2. DB-IP (Smart Date Fallback)
@@ -43,11 +44,9 @@ jobs:
             URL_CURRENT="https://download.db-ip.com/free/${FILENAME}-${CURRENT_MONTH}.mmdb.gz"
             URL_PREV="https://download.db-ip.com/free/${FILENAME}-${PREV_MONTH}.mmdb.gz"
             
-            echo "Processing DB-IP $type..."
             if curl --output /dev/null --silent --head --fail "$URL_CURRENT"; then
               curl -s -L -o "output/${FILENAME}.mmdb.gz" "$URL_CURRENT"
             else
-              echo "Trying previous month..."
               curl -s -L -o "output/${FILENAME}.mmdb.gz" "$URL_PREV"
             fi
 
@@ -57,48 +56,46 @@ jobs:
           done
 
       # ----------------------------------------------------------------
-      # 3. MaxMind GeoLite2 (High Failure Risk - Isolated)
-      # 使用 Curl + Browser UA 尝试绕过 451，并允许失败
+      # 3. MaxMind (ALL via Official Docker)
+      # 所有的 GeoLite2 数据库 (ASN, City, Country) 都通过官方工具下载
       # ----------------------------------------------------------------
-      - name: Download MaxMind
-        continue-on-error: true # 关键：如果 MaxMind 451 报错，不中断后续步骤
+      - name: Download MaxMind (Official Docker)
+        continue-on-error: true
+        env:
+          GEOIPUPDATE_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
+          GEOIPUPDATE_LICENSE_KEY: ${{ secrets.MAXMIND_TOKEN }}
+          # 在这里指定要下载的三个数据库 ID，用空格分隔
+          GEOIPUPDATE_EDITION_IDS: "GeoLite2-ASN GeoLite2-City GeoLite2-Country"
+          GEOIPUPDATE_FREQUENCY: "0" # 0 表示运行一次后立即退出
+          GEOIPUPDATE_VERBOSE: "1"   # 开启详细日志
         run: |
-          declare -a editions=("GeoLite2-ASN" "GeoLite2-City" "GeoLite2-Country")
-          
-          for edition in "${editions[@]}"; do
-            echo "Processing MaxMind $edition..."
-            
-            # 使用 Curl 模拟浏览器 User-Agent
-            HTTP_CODE=$(curl -s -L -w "%{http_code}" -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
-              -o "${edition}.tar.gz" \
-              "https://download.maxmind.com/app/geoip_download?edition_id=${edition}&license_key=${{ secrets.MAXMIND_TOKEN }}&suffix=tar.gz")
-            
-            if [ "$HTTP_CODE" == "200" ]; then
-              echo "Download success for $edition."
-              # 解压
-              mkdir -p temp_extract
-              tar -xzf "${edition}.tar.gz" -C temp_extract
-              find temp_extract -name "*.mmdb" -exec mv {} output/ \;
-              rm -rf temp_extract "${edition}.tar.gz"
-            else
-              echo "Failed to download $edition. HTTP Code: $HTTP_CODE (Likely blocked by MaxMind)"
-              # 删除可能的空文件
-              rm -f "${edition}.tar.gz"
-            fi
-          done
+          # 检查 Account ID 是否存在，如果不存在则跳过，防止报错
+          if [ -z "$GEOIPUPDATE_ACCOUNT_ID" ]; then
+            echo "::warning::Skipping MaxMind update because MAXMIND_ACCOUNT_ID secret is missing."
+            exit 0
+          fi
+
+          echo "Starting Official GeoIP Update..."
+          docker run --rm \
+            -e GEOIPUPDATE_ACCOUNT_ID \
+            -e GEOIPUPDATE_LICENSE_KEY \
+            -e GEOIPUPDATE_EDITION_IDS \
+            -e GEOIPUPDATE_FREQUENCY \
+            -e GEOIPUPDATE_VERBOSE \
+            -v $(pwd)/output:/usr/share/GeoIP \
+            maxmindinc/geoipupdate
 
       # ----------------------------------------------------------------
-      # 4. IP2Location
+      # 4. IP2Location (Curl)
       # ----------------------------------------------------------------
       - name: Download IP2Location
         continue-on-error: true
         run: |
           CODE="DB11.LITE.BIN"
-          echo "Downloading IP2Location $CODE..."
+          echo "Downloading IP2Location..."
           curl -s -L -o "ip2location.zip" "https://www.ip2location.com/download/?token=${{ secrets.IP2LOCATION_TOKEN }}&file=$CODE"
-          
           if [ -f "ip2location.zip" ]; then
-            unzip -o ip2location.zip -d output/ || echo "Unzip failed, maybe token expired?"
+            unzip -o ip2location.zip -d output/ || rm -f ip2location.zip
             rm -f ip2location.zip
           fi
 
@@ -125,7 +122,6 @@ jobs:
           files: output/*
           body: |
             Automatic daily update.
-            Sources: IPinfo, DB-IP, MaxMind, IP2Location.
-            (Note: Some sources might be missing if upstream blocked the download)
+            Sources: IPinfo, DB-IP, MaxMind (Official Docker), IP2Location.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
