@@ -29,7 +29,7 @@ jobs:
           CURRENT_MONTH=$(date +%Y-%m)
           PREV_MONTH=$(date -d "last month" +%Y-%m)
           declare -a types=("asn" "city" "country")
-           
+          
           for type in "${types[@]}"; do
             FILENAME="dbip-${type}-lite"
             URL_CURRENT="https://download.db-ip.com/free/${FILENAME}-${CURRENT_MONTH}.mmdb.gz"
@@ -102,8 +102,13 @@ jobs:
           name: IP Database Update ${{ steps.tag.outputs.release_tag }}
           files: output/*
           body: |
-            Automatic daily update.
-            Sources: 
+            ### Legal Notice and Data Usage
+
+            - Upstream Licenses: The database files (.mmdb) included in this release are provided by third-party suppliers (MaxMind, DB-IP, IPinfo, etc.) and are subject to their respective licenses. By downloading these files, you agree to their specific terms of use and attribution requirements.
+            - No Warranty: These files are provided as-is without any warranty of accuracy or timeliness. The automated synchronization process may fail or provide outdated information.
+            - Compliance: This repository is for technical exchange and testing purposes. Ensure your final application complies with the latest policies of the data providers.
+
+            ### Sources Updated
             - IPinfo
             - DB-IP
             - MaxMind (Official Docker)
