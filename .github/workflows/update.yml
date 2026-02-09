@@ -38,7 +38,7 @@ jobs:
           CURRENT_MONTH=$(date +%Y-%m)
           PREV_MONTH=$(date -d "last month" +%Y-%m)
           declare -a types=("asn" "city" "country")
-          
+           
           for type in "${types[@]}"; do
             FILENAME="dbip-${type}-lite"
             URL_CURRENT="https://download.db-ip.com/free/${FILENAME}-${CURRENT_MONTH}.mmdb.gz"
@@ -100,7 +100,15 @@ jobs:
           fi
 
       # ----------------------------------------------------------------
-      # 5. 清理与发布
+      # 5. Sapics (GeoLite2 Enhanced)
+      # ----------------------------------------------------------------
+      - name: Download Sapics GeoLite2 Enhanced
+        run: |
+          echo "Downloading Sapics GeoLite2 Enhanced (High Accuracy)..."
+          curl -s -L -f -o output/geolite2-geo-whois-asn-country.mmdb "https://cdn.jsdelivr.net/npm/@ip-location-db/geolite2-geo-whois-asn-country-mmdb/geolite2-geo-whois-asn-country.mmdb"
+
+      # ----------------------------------------------------------------
+      # 6. 清理与发布
       # ----------------------------------------------------------------
       - name: Delete Older Releases
         uses: dev-drprasad/delete-older-releases@v0.3.2
@@ -122,6 +130,11 @@ jobs:
           files: output/*
           body: |
             Automatic daily update.
-            Sources: IPinfo, DB-IP, MaxMind (Official Docker), IP2Location.
+            Sources: 
+            - IPinfo
+            - DB-IP
+            - MaxMind (Official Docker)
+            - IP2Location
+            - Sapics (GeoLite2 + GeoFeed + Whois + ASN)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
