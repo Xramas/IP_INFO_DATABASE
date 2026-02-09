@@ -1,7 +1,7 @@
-# IP Info Database
+# IP-Database-MMDB
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Xramas/IP_INFO_DATABASE/blob/master/LICENSE)
-[![Last Update](https://img.shields.io/github/release-date/Xramas/IP_INFO_DATABASE)](https://github.com/Xramas/IP_INFO_DATABASE/releases/latest)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Xramas/ip-database-mmdb/blob/master/LICENSE)
+[![Last Update](https://img.shields.io/github/release-date/Xramas/ip-database-mmdb)](https://github.com/Xramas/ip-database-mmdb/releases/latest)
 
 A repository for automated aggregation, update, and distribution of popular public IP geolocation databases in MMDB format.
 
@@ -11,11 +11,12 @@ A repository for automated aggregation, update, and distribution of popular publ
 
 | Database Name | Source | Download Link |
 | :--- | :--- | :--- |
-| **IPinfo Lite** | IPinfo.io | [Download](https://github.com/Xramas/IP_INFO_DATABASE/releases/latest/download/ipinfo_lite.mmdb) |
-| **Combined Geo-Whois** | Sapics/MaxMind | [Download](https://github.com/Xramas/IP_INFO_DATABASE/releases/latest/download/geolite2-geo-whois-asn-country.mmdb) |
-| **GeoLite2 Country** | MaxMind | [Download](https://github.com/Xramas/IP_INFO_DATABASE/releases/latest/download/GeoLite2-Country.mmdb) |
-| **GeoLite2 City** | MaxMind | [Download](https://github.com/Xramas/IP_INFO_DATABASE/releases/latest/download/GeoLite2-City.mmdb) |
-| **DB-IP City Lite** | DB-IP | [Download](https://github.com/Xramas/IP_INFO_DATABASE/releases/latest/download/dbip-city-lite.mmdb) |
+| **IPinfo Lite** | IPinfo.io | [Download](https://github.com/Xramas/ip-database-mmdb/releases/latest/download/ipinfo_lite.mmdb) |
+| **Combined Geo-Whois** | Sapics/MaxMind | [Download](https://github.com/Xramas/ip-database-mmdb/releases/latest/download/geolite2-geo-whois-asn-country.mmdb) |
+| **GeoLite2 Country** | MaxMind | [Download](https://github.com/Xramas/ip-database-mmdb/releases/latest/download/GeoLite2-Country.mmdb) |
+| **GeoLite2 City** | MaxMind | [Download](https://github.com/Xramas/ip-database-mmdb/releases/latest/download/GeoLite2-City.mmdb) |
+| **GeoLite2 ASN** | MaxMind | [Download](https://github.com/Xramas/ip-database-mmdb/releases/latest/download/GeoLite2-ASN.mmdb) |
+| **DB-IP City Lite** | DB-IP | [Download](https://github.com/Xramas/ip-database-mmdb/releases/latest/download/dbip-city-lite.mmdb) |
 
 ---
 
@@ -33,7 +34,7 @@ The data files distributed in this repository are governed by the terms of their
 
 ## Automation
 
-This repository uses GitHub Actions to pull and repackage data every Monday (00:00 UTC). 
+This repository uses GitHub Actions to pull and repackage data periodically. The automation ensures that you always have access to the latest available free tiers of IP intelligence data.
 
 ---
 
