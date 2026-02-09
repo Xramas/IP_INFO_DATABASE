@@ -1,14 +1,43 @@
-# IP_INFO_DATABASE
+# IP Info Database (MMDB Collection)
+
+[![License](https://img.shields.io/github/license/Xramas/IP_INFO_DATABASE)](https://github.com/Xramas/IP_INFO_DATABASE/blob/main/LICENSE)
+[![Last Update](https://img.shields.io/github/release-date/Xramas/IP_INFO_DATABASE)](https://github.com/Xramas/IP_INFO_DATABASE/releases/latest)
+
+A repository for automated aggregation, update, and distribution of popular public IP geolocation databases in MMDB format.
+
+---
+
+## Quick Download (Latest Releases)
+
+| Database Name | Source | Download Link |
+| :--- | :--- | :--- |
+| **IPinfo Lite** | IPinfo.io | [Download](https://github.com/Xramas/IP_INFO_DATABASE/releases/latest/download/ipinfo_lite.mmdb) |
+| **Combined Geo-Whois** | Sapics/MaxMind | [Download](https://github.com/Xramas/IP_INFO_DATABASE/releases/latest/download/geolite2-geo-whois-asn-country.mmdb) |
+| **GeoLite2 Country** | MaxMind | [Download](https://github.com/Xramas/IP_INFO_DATABASE/releases/latest/download/GeoLite2-Country.mmdb) |
+| **DB-IP City Lite** | DB-IP | [Download](https://github.com/Xramas/IP_INFO_DATABASE/releases/latest/download/dbip-city-lite.mmdb) |
+
+---
+
 ## Databases & Licenses
 
-This project includes or downloads IP geolocation databases from the following sources. Please refer to their respective licenses for usage terms and attribution requirements.
+The data files distributed in this repository are governed by the terms of their original providers.
 
-| Database Source | License Type | License / Terms Link | Attribution Requirement |
-| :--- | :--- | :--- | :--- |
-| **MaxMind GeoLite2** | Commercial / EULA | [GeoLite2 EULA](https://www.maxmind.com/en/geolite2/eula) | Required (Product includes GeoLite2 data created by MaxMind) |
-| **DB-IP Lite** | CC BY 4.0 | [Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/) | Required (This site or product includes IP2Location LITE data available from [lite.ip2location.com](https://lite.ip2location.com)) |
-| **IPinfo Free IP** | CC BY-SA 4.0 | [CC BY-SA 4.0](https://ipinfo.io/products/free-ip-database) | Required (Link back to [ipinfo.io](https://ipinfo.io)) |
-| **IP2Location LITE** | Open Data License | [Term of Use](https://lite.ip2location.com/term-of-use) | Required (This site or product includes IP2Location LITE data available from [lite.ip2location.com](https://lite.ip2location.com)) |
-| **Sapics (GeoLite2 Enhanced)** | GeoLite2 License | [GeoLite2 EULA](https://www.maxmind.com/en/geolite2/eula) | Required (Derived from MaxMind GeoLite2 data) |
+| Source | License Type | Attribution Requirement |
+| :--- | :--- | :--- |
+| **MaxMind GeoLite2** | [GeoLite2 EULA](https://www.maxmind.com/en/geolite2/eula) | Must state: "This product includes GeoLite2 data created by MaxMind." |
+| **DB-IP Lite** | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | Must provide a link to [db-ip.com](https://db-ip.com). |
+| **IPinfo Free** | [CC BY-SA 4.0](https://ipinfo.io/products/free-ip-database) | Must provide a link back to [ipinfo.io](https://ipinfo.io). |
 
-> **Note:** The `geolite2-geo-whois-asn-country.mmdb` is a composite database provided by [sapics/ip-location-db](https://github.com/sapics/ip-location-db) which incorporates data from MaxMind GeoLite2.
+---
+
+## 🛠 Automation
+
+This repository uses GitHub Actions to pull and repackage data every Monday (00:00 UTC). 
+
+---
+
+## Disclaimer & Limitation of Liability
+
+* **Scope**: The MIT License of this repository applies to the **scripts and code only**, not to the binary `.mmdb` files.
+* **Data Freshness**: The author does not guarantee the timeliness or accuracy of the data. IP allocations change frequently; use these files at your own discretion.
+* **Compliance**: Users are responsible for ensuring their use of the data complies with the EULA/Terms of the respective providers. The author shall not be held liable for any damages or legal issues arising from the use of the data provided.
